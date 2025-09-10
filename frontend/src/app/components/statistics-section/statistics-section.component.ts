@@ -1,7 +1,8 @@
 import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {StatisticsCardComponent} from '../statistics-card/statistics-card.component';
-import {faCheck, faHourglass, faPaperPlane, faXmark} from '@fortawesome/free-solid-svg-icons';
+import {faHourglass, faListCheck, faXmark} from '@fortawesome/free-solid-svg-icons';
+import {faCircleCheck, faClock} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 @Component({
@@ -12,23 +13,18 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
   styleUrl: './statistics-section.component.css'
 })
 export class StatisticsSectionComponent {
-  faHourglass = faHourglass;
-  faCheck = faCheck;
-  faXmark = faXmark;
-  faPaperPlane = faPaperPlane;
-
   statistics = [
     {
       title: 'Confirmé',
       count: 28,
-      icon: faCheck,
+      icon: faCircleCheck,
       colorClass: 'text-green-600',
       iconColorClass: 'text-green-500'
     },
     {
       title: 'À organiser',
       count: 12,
-      icon: faPaperPlane,
+      icon: faListCheck,
       colorClass: 'text-orange-500',
       iconColorClass: 'text-orange-500'
     },
@@ -42,7 +38,7 @@ export class StatisticsSectionComponent {
     {
       title: 'En recherche de place',
       count: 8,
-      icon: faHourglass,
+      icon: faClock,
       colorClass: 'text-blue-500',
       iconColorClass: 'text-blue-500'
     }
