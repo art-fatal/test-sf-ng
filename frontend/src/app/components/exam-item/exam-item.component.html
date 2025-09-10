@@ -1,0 +1,46 @@
+<div class="grid grid-cols-5 gap-x-4 gap-y-3 items-center border border-gray-200 p-4 rounded-2xl px-[2rem]">
+  <div class="flex items-center space-x-3">
+    <fa-icon [icon]="faUser"/>
+    <span class="font-semibold">{{ exam.studentName }}</span>
+  </div>
+
+  <div class="flex space-x-6 text-sm text-gray-600">
+    <span *ngIf="exam.location !== 'En attente'">
+      <fa-icon [icon]="faLocationDot" class="me-2" size="lg"></fa-icon>
+      {{ exam.location }}
+    </span>
+    <span *ngIf="exam.location === 'En attente'">
+      <fa-icon [icon]="faLocationDot" class="me-2" size="lg"></fa-icon>
+      En attente
+    </span>
+  </div>
+
+  <div class="flex space-x-6 text-sm text-gray-600">
+    <span *ngIf="exam.date !== 'En attente'">
+      <fa-icon [icon]="faCalendar" class="me-2"></fa-icon>
+      {{ exam.date }}
+    </span>
+    <span *ngIf="exam.date === 'En attente'">
+      <fa-icon [icon]="faCalendar" class="me-2"></fa-icon>
+      En attente
+    </span>
+  </div>
+
+  <div class="flex space-x-6 text-sm text-gray-600">
+    <span *ngIf="exam.time !== 'En attente'">
+      <fa-icon [icon]="faClock" class="me-2"></fa-icon>
+      {{ exam.time }}
+    </span>
+    <span *ngIf="exam.time === 'En attente'">
+      <fa-icon [icon]="faClock" class="me-2"></fa-icon>
+      En attente
+    </span>
+  </div>
+
+  <div>
+    <span [ngClass]="getStatusConfig().class">
+      <fa-icon [icon]="getStatusConfig().icon" class="me-2"></fa-icon>
+      {{ getStatusConfig().text }}
+    </span>
+  </div>
+</div>
