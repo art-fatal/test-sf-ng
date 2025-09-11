@@ -2,6 +2,15 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.20.
 
+## Documentation
+
+Comprehensive API and component docs are available in `docs/`:
+
+- See `docs/README.md` for the index.
+- Components overview in `docs/components/README.md` and detailed pages per component.
+- App configuration in `docs/app/Configuration.md` and routing in `docs/app/Routing.md`.
+- Runtime and SSR details in `docs/runtime/`.
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
