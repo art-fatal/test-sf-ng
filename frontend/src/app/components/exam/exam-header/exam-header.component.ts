@@ -1,7 +1,7 @@
-import { Component, Input, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ExamDomainStateService } from '@services/exam/exam-domain-state.service';
-import { ExamUiStateService } from '@services/exam/exam-ui-state.service';
+import {Component, inject} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {ExamDomainStateService} from '@services/exam/exam-domain-state.service';
+import {ExamUiStateService} from '@services/exam/exam-ui-state.service';
 
 @Component({
   selector: 'app-exam-header',

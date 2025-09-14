@@ -8,10 +8,14 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
-    public function __construct(private readonly ParameterBagInterface $parameterBag)
+    public function __construct(
+        private readonly ParameterBagInterface $parameterBag,
+        private readonly UserPasswordHasherInterface $userPasswordHasher
+    )
     {
     }
 
@@ -24,21 +28,22 @@ class AppFixtures extends Fixture
     public function loadAdminUser(ObjectManager $manager): void
     {
         $user = new User();
+
+        $password = $this->userPasswordHasher->hashPassword($user, $this->parameterBag->get('admin_password') ?? 'admin');
         $user->setName('Admin')
-            ->setEmail($this->parameterBag->get('admin_email') || 'admin@example.com')
+            ->setEmail($this->parameterBag->get('admin_email') ?? 'admin@example.com')
             ->setRoles(['ROLE_ADMIN'])
-            ->setPassword($this->parameterBag->get('admin_password') || 'admin');
+            ->setPassword($password);
 
         $manager->persist($user);
 
         $manager->flush();
     }
 
-    private function loadExams(ObjectManager $manager)
+    private function loadExams(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');
 
-        $statuses = ['confirmed', 'to_organize', 'cancelled', 'searching'];
 
         for ($i = 0; $i < 4; $i++) {
             $exam = new Exam();
@@ -46,7 +51,7 @@ class AppFixtures extends Fixture
             $exam->setLocation($faker->city());
             $exam->setDate($faker->dateTimeBetween('-2 days', '+1 month'));
             $exam->setTime($faker->numberBetween(0,23));
-            $exam->setStatus($statuses[$i]);
+            $exam->setStatus(Exam::STATES[$i]);
 
             $manager->persist($exam);
         }

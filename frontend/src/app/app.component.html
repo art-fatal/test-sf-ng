@@ -1,7 +1,5 @@
-<div class="max-w-screen-xl mx-auto mt-6">
-  <app-statistics-section></app-statistics-section>
-  <app-exam-list></app-exam-list>
+<div *ngIf="loading()" class="h-screen w-screen bg-gray-50 opacity-50 relative flex items-center justify-center">
+    <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
 </div>
 
-<app-exam-form></app-exam-form>
-<app-status-modal></app-status-modal>
+<router-outlet></router-outlet>

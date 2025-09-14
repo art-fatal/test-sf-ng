@@ -1,5 +1,13 @@
 <div class=" p-6 mb-6">
-  <h3 class="text-lg font-bold text-center mb-4">Statistiques des examens</h3>
+  <div class="relative">
+    <h3 class="text-lg font-bold text-center mb-8">Statistiques des examens</h3>
+    <button
+      *ngIf="authService.isAuthenticated()"
+      class="absolute top-0 right-0 bg-white hover:bg-gray-100 border border-gray-300 text-gray-500 px-4 py-2 rounded-xl"
+      (click)="logout()">
+      <fa-icon [icon]="faSignOutAlt"></fa-icon>
+    </button>
+  </div>
 
   <div class="grid grid-cols-4 gap-4 text-center">
     <app-statistics-card

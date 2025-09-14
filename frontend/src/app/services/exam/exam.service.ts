@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
+import { AuthService } from '@services/auth/auth.service';
 
 export type ExamApiResponse = ExamApiData[];
 
@@ -38,32 +39,26 @@ export interface ExamData {
 export class ExamService {
   private apiUrl = `${environment.apiUrl}/exams`;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
   getExams(): Observable<ExamApiResponse> {
     return this.http.get<ExamApiResponse>(this.apiUrl, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+      headers: this.authService.getAuthHeaders()
     });
   }
 
   createExam(examData: Partial<ExamApiData>): Observable<ExamApiData> {
     return this.http.post<ExamApiData>(this.apiUrl, examData, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+      headers: this.authService.getAuthHeaders()
     });
   }
 
   updateExam(examData: Partial<ExamApiData>): Observable<ExamApiData> {
     return this.http.patch<ExamApiData>(this.apiUrl + '/' + examData.id, examData, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+      headers: this.authService.getAuthHeaders()
     });
   }
 
