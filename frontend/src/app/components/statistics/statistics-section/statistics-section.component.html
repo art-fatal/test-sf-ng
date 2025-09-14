@@ -1,0 +1,10 @@
+<div class=" p-6 mb-6">
+  <h3 class="text-lg font-bold text-center mb-4">Statistiques des examens</h3>
+
+  <div class="grid grid-cols-4 gap-4 text-center">
+    <app-statistics-card
+      *ngFor="let stat of examDomainStateService.formattedStatistics()"
+      [stat]="stat">
+    </app-statistics-card>
+  </div>
+</div>

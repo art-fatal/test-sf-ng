@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\ExamRepository;
 use Doctrine\DBAL\Types\Types;
@@ -14,15 +15,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(),
-        new Post()
+        new Post(),
+        new Patch(),
     ]
 )]
 class Exam
 {
-    public const string STATE_CONFIRMED = 'Confirmed';
-    public const string STATE_WAITING_PLACE = 'WaitingPlace';
-    public const string STATE_CANCELED = 'Canceled';
-    public const string STATE_TO_ORGANIZE = 'ToOrganize';
+    public const string STATE_CONFIRMED = 'confirmed';
+    public const string STATE_WAITING_PLACE = 'waiting_place';
+    public const string STATE_CANCELED = 'canceled';
+    public const string STATE_TO_ORGANIZE = 'to_organize';
     public const array STATES = [
         self::STATE_CONFIRMED,
         self::STATE_WAITING_PLACE,
@@ -42,10 +44,10 @@ class Exam
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $location = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
+    #[ORM\Column(type: Types::INTEGER)]
     #[Assert\NotBlank(message: 'Please enter the time')]
-    #[Assert\Time(message: 'Please enter a valid time')]
-    private ?\DateTime $time = null;
+    #[Assert\Range(notInRangeMessage: 'Time must be between 0 and 23', min: 0, max: 23)]
+    private ?int $time = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Please enter the status')]
@@ -54,7 +56,6 @@ class Exam
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\NotBlank(message: 'Please enter the date')]
-    #[Assert\Date(message: 'Please enter a valid date')]
     private ?\DateTime $date = null;
 
     public function getId(): ?int
@@ -86,12 +87,12 @@ class Exam
         return $this;
     }
 
-    public function getTime(): ?\DateTime
+    public function getTime(): ?int
     {
         return $this->time;
     }
 
-    public function setTime(\DateTime $time): static
+    public function setTime(int $time): static
     {
         $this->time = $time;
 

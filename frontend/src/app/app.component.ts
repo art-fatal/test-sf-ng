@@ -1,56 +1,23 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { StatisticsSectionComponent } from './components/statistics-section/statistics-section.component';
-import { ExamListComponent } from './components/exam-list/exam-list.component';
-import { ExamData } from './components/exam-item/exam-item.component';
+import {Component, inject, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {StatisticsSectionComponent} from '@components/statistics/statistics-section/statistics-section.component';
+import {ExamListComponent} from '@components/exam/exam-list/exam-list.component';
+import {ExamFormComponent} from '@components/exam/exam-form/exam-form.component';
+import {StatusModalComponent} from '@components/exam/status-modal/status-modal.component';
+import {ExamDomainStateService} from '@services/exam/exam-domain-state.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, StatisticsSectionComponent, ExamListComponent],
+  imports: [CommonModule, StatisticsSectionComponent, ExamListComponent, ExamFormComponent, StatusModalComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
-  title = 'frontend';
+export class AppComponent implements OnInit {
+  protected examDomainStateService = inject(ExamDomainStateService);
 
-  exams: ExamData[] = [
-    {
-      studentName: 'Isabella.S',
-      location: 'En attente',
-      date: 'En attente',
-      time: 'En attente',
-      status: 'searching',
-      hasIcon: true
-    },
-    {
-      studentName: 'Franziska.S',
-      location: 'Martigues-B',
-      date: '16 juin',
-      time: '14h',
-      status: 'confirmed',
-      hasIcon: false
-    },
-    {
-      studentName: 'Lucas.R',
-      location: 'Martigues-B',
-      date: '21 juin',
-      time: '17h',
-      status: 'to_organize',
-      hasIcon: false
-    },
-    {
-      studentName: 'Léo.C',
-      location: 'Martigues-B',
-      date: '26 mai',
-      time: '13h',
-      status: 'cancelled',
-      hasIcon: false
-    }
-  ];
-
-  onOrganizeExam() {
-    console.log('Organiser un examen');
-    // Logique pour organiser un examen
+  async ngOnInit() {
+    await this.examDomainStateService.loadExams();
   }
+
 }

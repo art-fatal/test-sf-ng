@@ -18,7 +18,7 @@
   <div class="flex space-x-6 text-sm text-gray-600">
     <span *ngIf="exam.date !== 'En attente'">
       <fa-icon [icon]="faCalendar" class="me-2"></fa-icon>
-      {{ exam.date }}
+      {{ exam.formattedDate }}
     </span>
     <span *ngIf="exam.date === 'En attente'">
       <fa-icon [icon]="faCalendar" class="me-2"></fa-icon>
@@ -27,18 +27,21 @@
   </div>
 
   <div class="flex space-x-6 text-sm text-gray-600">
-    <span *ngIf="exam.time !== 'En attente'">
+    <span *ngIf="exam.formattedTime !== 'En attente'">
       <fa-icon [icon]="faClock" class="me-2"></fa-icon>
-      {{ exam.time }}
+      {{ exam.formattedTime }}
     </span>
-    <span *ngIf="exam.time === 'En attente'">
+    <span *ngIf="exam.formattedTime === 'En attente'">
       <fa-icon [icon]="faClock" class="me-2"></fa-icon>
       En attente
     </span>
   </div>
 
-  <div>
-    <span [ngClass]="getStatusConfig().class">
+  <div class="flex">
+    <span
+      [ngClass]="getStatusConfig().class + ' cursor-pointer hover:opacity-80 transition-opacity'"
+      (click)="onStatusBadgeClick()"
+      title="Cliquer pour changer le statut">
       <fa-icon [icon]="getStatusConfig().icon" class="me-2"></fa-icon>
       {{ getStatusConfig().text }}
     </span>
