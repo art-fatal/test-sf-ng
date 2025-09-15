@@ -74,7 +74,6 @@ export class ExamDomainStateService {
 
   async loadExams(): Promise<void> {
     this.startLoading();
-    console.log('Chargement des examens');
     try {
       const response = await firstValueFrom(this.examService.getExams());
       if (response) {
