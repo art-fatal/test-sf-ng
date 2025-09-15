@@ -1,0 +1,95 @@
+services:
+  # Database service
+  db:
+    image: mariadb:10.11
+    container_name: test-lafatra-db
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_ROOT_PASSWORD:-root}'
+      MYSQL_DATABASE: '${DB_NAME:-test-lafatra}'
+      MYSQL_USER: '${DB_USER:-test-lafatra}'
+      MYSQL_PASSWORD: '${DB_PASSWORD:-test-lafatra123}'
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - '3307:3306'
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Backend service (Symfony + PHP 8.4)
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: test-lafatra-backend
+    volumes:
+      - ../backend:/srv/api:cached
+      - backend_vendor:/srv/api/vendor
+    environment:
+      - DATABASE_URL=mysql://${DB_USER:-test-lafatra}:${DB_PASSWORD:-test-lafatra123}@db:3306/${DB_NAME:-test-lafatra}
+      - APP_ENV=dev
+      - APP_DEBUG=1
+      - APP_SECRET=${APP_SECRET:-your-secret-key-here}
+      - JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
+      - JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
+      - JWT_PASSPHRASE=${JWT_PASSPHRASE:-your-jwt-passphrase}
+      - ENABLE_FIXTURES=${ENABLE_FIXTURES:-1}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+    ports:
+      - '8001:80'
+
+  # Frontend service (Angular 18 + Node 22)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: test-lafatra-frontend
+    ports:
+      - '4200:80'
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  # PHP CLI service for running Symfony commands
+  php-cli:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: test-lafatra-php-cli
+    entrypoint: ['php']
+    command: ['bin/console']
+    volumes:
+      - ../backend:/srv/api:cached
+      - backend_vendor:/srv/api/vendor
+    environment:
+      - DATABASE_URL=mysql://${DB_USER:-test-lafatra}:${DB_PASSWORD:-test-lafatra123}@db:3306/${DB_NAME:-test-lafatra}
+      - APP_ENV=dev
+      - APP_DEBUG=1
+      - APP_SECRET=${APP_SECRET:-your-secret-key-here}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+    driver: local
+  backend_vendor:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
