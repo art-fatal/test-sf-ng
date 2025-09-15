@@ -1,77 +1,41 @@
-# Application de Gestion d'Examens
-
-Cette application permet de gérer les examens avec un backend Symfony et un frontend Angular.
-
 ## Structure du Projet
-
 - `backend/` - API Symfony avec API Platform
 - `frontend/` - Application Angular
 - `infra/` - Configuration Docker
 
 ## Prérequis
+- Docker Desktop (inclut Docker et Docker Compose)
 
-- PHP 8.4
-- Composer
-- Node.js 18+
-- npm
-- PostgreSQL (pour la base de données)
-
-## Installation et Démarrage
-
-### Backend (Symfony)
-
-1. Aller dans le dossier backend :
+## Démarrage rapide (Docker)
+1. Démarrer les services:
 ```bash
-cd backend
+docker-compose up -d
 ```
 
-2. Installer les dépendances :
-```bash
-composer install
-```
+2. Accéder aux services:
+- Frontend (Angular): `http://localhost:4201`
+- Backend API (Symfony): `http://localhost:8001`
+- Base de données (MariaDB): `localhost:3307`
 
-3. Configurer la base de données dans `.env` :
-```env
-DATABASE_URL="postgresql://username:password@127.0.0.1:5432/exam_db?serverVersion=15&charset=utf8"
-```
+### Variables d'environnement (optionnel)
+Un fichier d'exemple est disponible: `infra/env.example`.
+Copiez-le en `.env` si vous souhaitez surcharger les valeurs par défaut (mots de passe, noms de BDD, etc.).
 
-4. Créer la base de données et exécuter les migrations :
-```bash
-php bin/console doctrine:database:create
-php bin/console doctrine:migrations:migrate
-```
-
-5. Démarrer le serveur :
-```bash
-php bin/console server:start
-```
-
-L'API sera disponible sur `https://localhost:8000`
-
-### Frontend (Angular)
-
-1. Aller dans le dossier frontend :
-```bash
-cd frontend
-```
-
-2. Installer les dépendances :
-```bash
-npm install
-```
-
-3. Démarrer le serveur de développement :
-```bash
-npm start
-```
-
-L'application sera disponible sur `http://localhost:4200`
+### Ports utilisés
+- 4200 → Frontend (Nginx)
+- 8001 → Backend (Nginx / Symfony)
+- 3307 → MariaDB (mappé vers 3306 dans le conteneur)
 
 ## API Endpoints
 
-- `GET /exams` - Récupérer tous les examens
+- L'API est exposée à la racine (pas de préfixe `/api`).
+- Authentification par JWT requise pour les routes protégées.
+
+- `GET /exams` - Récupérer tous les examens (401 sans token = normal)
 - `GET /exams/{id}` - Récupérer un examen par ID
 - `POST /exams` - Créer un nouvel examen
+
+Base URL en local: `http://localhost:8001`
 
 ## Fonctionnalités
 
@@ -81,21 +45,8 @@ L'application sera disponible sur `http://localhost:4200`
 - Gestion des erreurs et états de chargement
 - Communication avec l'API Symfony via HTTP
 
-## Configuration
+---
 
-L'URL de l'API peut être modifiée dans `frontend/src/environments/environment.ts` :
+## Mode manuel (optionnel, sans Docker)
 
-```typescript
-export const environment = {
-  production: false,
-  apiUrl: 'https://localhost:8000'
-};
-```
-
-## Dépannage
-
-Si l'application affiche des données de test au lieu des données de l'API, vérifiez que :
-1. Le serveur Symfony est démarré
-2. La base de données est configurée et accessible
-3. L'URL de l'API dans l'environnement est correcte
-4. Les certificats SSL sont valides (pour HTTPS)
+Si vous préférez lancer chaque partie sans Docker, conservez les étapes classiques (Composer/NPM), mais la solution recommandée est: `docker-compose up -d`.
