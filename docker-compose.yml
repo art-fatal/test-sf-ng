@@ -24,11 +24,11 @@ services:
   # Backend service (Symfony + PHP 8.4)
   backend:
     build:
-      context: ../backend
+      context: ./backend
       dockerfile: Dockerfile
     container_name: test-lafatra-backend
     volumes:
-      - ../backend:/srv/api:cached
+      - ./backend:/srv/api:cached
       - backend_vendor:/srv/api/vendor
     environment:
       - DATABASE_URL=mysql://${DB_USER:-test-lafatra}:${DB_PASSWORD:-test-lafatra123}@db:3306/${DB_NAME:-test-lafatra}
@@ -51,7 +51,7 @@ services:
   # Frontend service (Angular 18 + Node 22)
   frontend:
     build:
-      context: ../frontend
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: test-lafatra-frontend
     ports:
@@ -65,13 +65,13 @@ services:
   # PHP CLI service for running Symfony commands
   php-cli:
     build:
-      context: ../backend
+      context: ./backend
       dockerfile: Dockerfile
     container_name: test-lafatra-php-cli
     entrypoint: ['php']
     command: ['bin/console']
     volumes:
-      - ../backend:/srv/api:cached
+      - ./backend:/srv/api:cached
       - backend_vendor:/srv/api/vendor
     environment:
       - DATABASE_URL=mysql://${DB_USER:-test-lafatra}:${DB_PASSWORD:-test-lafatra123}@db:3306/${DB_NAME:-test-lafatra}
