@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+var/log/*
+var/cache/*
+var/sessions/*
+
+# Tests
+tests/
+phpunit.xml
+.phpunit.result.cache
+
+# Node modules (si présents)
+node_modules/
+npm-debug.log
+
+# Environment files
+.env*
+!.env.docker
+
+# Temporary files
+*.tmp
+*.temp

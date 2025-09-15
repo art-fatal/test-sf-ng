@@ -1,91 +1,94 @@
-version: '3.8'
 services:
-db:
-image: mariadb:10.11
-environment:
-MYSQL_ROOT_PASSWORD: '${DB_ROOT_PASSWORD:-root}'
-MYSQL_DATABASE: '${DB_NAME:-app}'
-MYSQL_USER: '${DB_USER:-app}'
-MYSQL_PASSWORD: '${DB_PASSWORD:-app}'
+  # Database service
+  db:
+    image: mariadb:10.11
+    container_name: marwaa-db
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_ROOT_PASSWORD:-root}'
+      MYSQL_DATABASE: '${DB_NAME:-marwaa}'
+      MYSQL_USER: '${DB_USER:-marwaa}'
+      MYSQL_PASSWORD: '${DB_PASSWORD:-marwaa123}'
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - '3307:3306'
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Backend service (Symfony + PHP 8.4)
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: marwaa-backend
+    volumes:
+      - ../backend:/srv/api:cached
+      - backend_vendor:/srv/api/vendor
+    environment:
+      - DATABASE_URL=mysql://${DB_USER:-marwaa}:${DB_PASSWORD:-marwaa123}@db:3306/${DB_NAME:-marwaa}
+      - APP_ENV=dev
+      - APP_DEBUG=1
+      - APP_SECRET=${APP_SECRET:-your-secret-key-here}
+      - JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
+      - JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
+      - JWT_PASSPHRASE=${JWT_PASSPHRASE:-your-jwt-passphrase}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+    ports:
+      - '8001:80'
+
+  # Frontend service (Angular 18 + Node 22)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: marwaa-frontend
+    ports:
+      - '4200:80'
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  # PHP CLI service for running Symfony commands
+  php-cli:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: marwaa-php-cli
+    entrypoint: ['php']
+    command: ['bin/console']
+    volumes:
+      - ../backend:/srv/api:cached
+      - backend_vendor:/srv/api/vendor
+    environment:
+      - DATABASE_URL=mysql://${DB_USER:-marwaa}:${DB_PASSWORD:-marwaa123}@db:3306/${DB_NAME:-marwaa}
+      - APP_ENV=dev
+      - APP_DEBUG=1
+      - APP_SECRET=${APP_SECRET:-your-secret-key-here}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
 volumes:
-- db_data:/var/lib/mysql
-ports:
-- '3306:3306'
-networks:
-- app-network
-
-
-php:
-build:
-context: ../backend
-dockerfile: Dockerfile
-volumes:
-- ../backend:/srv/api:cached
-- ../backend/vendor:/srv/api/vendor
-- ../backend/public:/srv/api/public
-environment:
-DATABASE_URL: 'mysql://${DB_USER:-app}:${DB_PASSWORD:-app}@db:3306/${DB_NAME:-app}'
-APP_ENV: dev
-depends_on:
-- db
-networks:
-- app-network
-
-
-php-cli:
-build:
-context: ../backend
-dockerfile: Dockerfile
-entrypoint: ['php']
-command: ['bin/console']
-volumes:
-- ../backend:/srv/api
-networks:
-- app-network
-
-
-backend-nginx:
-image: nginx:1.25-alpine
-volumes:
-- ../backend/public:/srv/api/public:ro
-- ./nginx-proxy.conf:/etc/nginx/conf.d/default.conf:ro
-ports:
-- '8000:80'
-depends_on:
-- php
-networks:
-- app-network
-
-
-node-builder:
-build:
-context: ../frontend
-dockerfile: Dockerfile
-volumes:
-- ../frontend:/usr/src/app:cached
-command: ['npm', 'run', 'build']
-networks:
-- app-network
-
-
-frontend-nginx:
-image: nginx:1.25-alpine
-volumes:
-- ../frontend/dist:/usr/share/nginx/html:ro
-- ../infra/frontend-nginx.conf:/etc/nginx/conf.d/default.conf:ro
-ports:
-- '4200:80'
-depends_on:
-- node-builder
-networks:
-- app-network
-
-
-volumes:
-db_data:
-
+  db_data:
+    driver: local
+  backend_vendor:
+    driver: local
 
 networks:
-app-network:
-driver: bridge
-
+  app-network:
+    driver: bridge
